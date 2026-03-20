@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STREETHUNTER APPARTMENT - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                <img src="apartment.png" alt="STREETHUNTER APPARTMENT"
+                    style="width: 100%; height: 120px; object-fit: cover; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 4px;">
+                <h2 style="font-size: 20px; font-weight: 800; color: var(--primary); line-height: 1.1;">
+                    STREETHUNTER<br>APPARTMENT</h2>
+            </div>
+
+            <div class="role-selector-card">
+                <p class="role-label">Account View</p>
+                <div class="toggle-container">
+                    <button id="btn-landlord" class="role-btn active" onclick="switchRole('landlord')">Landlord</button>
+                    <button id="btn-tenant" class="role-btn" onclick="switchRole('tenant')">Tenant</button>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#" class="nav-item" data-target="payments">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Payments</span>
+                </a>
+                <a href="#" class="nav-item" data-target="tenants" id="nav-tenants">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Tenants</span>
+                </a>
+                <a href="#" class="nav-item" data-target="vacancies">
+                    <i class="fa-solid fa-door-open"></i>
+                    <span>Vacancies</span>
+                </a>
+                <a href="#" class="nav-item" data-target="repairs">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    <span>Repairs</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <img src="" alt="User" id="user-avatar">
+                    <div class="user-details">
+                        <span id="user-name">Loading...</span>
+                        <span id="user-role">...</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 id="page-title">Dashboard</h1>
+                    <p id="page-subtitle">Welcome back, let's check on your properties.</p>
+                </div>
+                <div class="header-right">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" placeholder="Search records, tenants...">
+                    </div>
+                    <button class="icon-btn tooltip-container">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    <button class="primary-btn add-btn"><i class="fa-solid fa-plus"></i> New Action</button>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Views -->
+                <div id="view-dashboard" class="view-section active"></div>
+                <div id="view-payments" class="view-section"></div>
+                <div id="view-tenants" class="view-section"></div>
+                <div id="view-vacancies" class="view-section"></div>
+                <div id="view-repairs" class="view-section"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Tenant Modal -->
+    <div id="tenant-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Tenant</h3>
+                <button class="close-btn" onclick="closeTenantModal()"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tenant Name</label>
+                    <input type="text" id="new-tenant-name" placeholder="E.g. John Doe">
+                </div>
+                <div class="form-group">
+                    <label>House Number / Unit</label>
+                    <input type="text" id="new-tenant-room" placeholder="E.g. House 42">
+                </div>
+                <div class="form-group">
+                    <label>Rent Amount / mo</label>
+                    <input type="text" id="new-tenant-rent" placeholder="E.g. $1,200">
+                </div>
+                <div class="form-group" style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                        <label>Email Contact</label>
+                        <input type="email" id="new-tenant-email" placeholder="E.g. user@example.com">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Phone Number</label>
+                        <input type="tel" id="new-tenant-phone" placeholder="E.g. 0797060144">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Assigned Password</label>
+                    <input type="text" id="new-tenant-password" placeholder="e.g. secret123">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn" onclick="closeTenantModal()">Cancel</button>
+                <button class="primary-btn" onclick="saveNewTenant()">Save Tenant</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Payment Modal -->
+    <div id="payment-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Record Payment</h3>
+                <button class="close-btn" onclick="closeModal('payment-modal')"><i
+                        class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Amount Paid</label>
+                    <input type="text" id="new-payment-amount" placeholder="E.g. $1,200">
+                </div>
+                <div class="form-group">
+                    <label>Tenant / Description / Method</label>
+                    <input type="text" id="new-payment-desc" placeholder="E.g. Alice Smith - Apt 4B">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn" onclick="closeModal('payment-modal')">Cancel</button>
+                <button class="primary-btn" onclick="savePayment()">Save Record</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Repair Modal -->
+    <div id="repair-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Submit Repair Ticket</h3>
+                <button class="close-btn" onclick="closeModal('repair-modal')"><i
+                        class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Issue Description</label>
+                    <input type="text" id="new-repair-issue" placeholder="E.g. Leaking faucet">
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="new-repair-priority" class="form-select">
+                        <option>Low</option>
+                        <option>Medium</option>
+                        <option>High</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn" onclick="closeModal('repair-modal')">Cancel</button>
+                <button class="primary-btn" onclick="saveRepair()">Submit Ticket</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authenticated Portal Only -->
+
+    <script src="app.js"></script>
+</body>
+
+</html>
